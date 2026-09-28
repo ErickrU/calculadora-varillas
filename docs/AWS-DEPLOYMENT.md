@@ -4,6 +4,10 @@ Esta guía publica la PWA con **Amazon S3 privado + Amazon CloudFront + Origin A
 
 > **Costos:** S3, CloudFront, transferencia, solicitudes e invalidaciones pueden generar cargos. La plantilla usa `PriceClass_100` para limitar el conjunto de ubicaciones de borde, pero no garantiza costo cero. Revisa AWS Pricing y configura un presupuesto antes de tratar el entorno como permanente.
 
+## Despliegue vigente
+
+La instancia actual está disponible en [https://d1or4j0yth4d72.cloudfront.net](https://d1or4j0yth4d72.cloudfront.net). Región, stack, controles observados y pruebas posteriores al despliegue se registran en [`DEPLOYMENT-STATUS.md`](DEPLOYMENT-STATUS.md).
+
 ## Arquitectura
 
 ```mermaid

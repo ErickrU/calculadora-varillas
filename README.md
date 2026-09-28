@@ -4,6 +4,12 @@ PWA sin dependencias que calcula **cuántas varillas longitudinales necesita una
 
 > **Uso académico.** No reemplaza el análisis estructural completo, el diagrama de interacción P–M ni la revisión de un ingeniero estructural responsable.
 
+## Aplicación publicada
+
+**AWS:** [https://d1or4j0yth4d72.cloudfront.net](https://d1or4j0yth4d72.cloudfront.net)
+
+El sitio se sirve por CloudFront desde un bucket S3 privado. Consulta la [evidencia del despliegue vigente](docs/DEPLOYMENT-STATUS.md) y la [guía operativa de AWS](docs/AWS-DEPLOYMENT.md).
+
 ## Características
 
 - columnas rectangulares, circulares con estribos y circulares con espiral;
@@ -58,6 +64,7 @@ Las cuatro barras de esquina pertenecen a dos caras; no se suman dos veces.
 
 - [Cálculos, unidades, ecuaciones y limitaciones](docs/CALCULATIONS.md)
 - [Arquitectura de la PWA y de AWS](docs/ARCHITECTURE.md)
+- [Estado y evidencia del despliegue vigente](docs/DEPLOYMENT-STATUS.md)
 - [Despliegue y operación segura en AWS](docs/AWS-DEPLOYMENT.md)
 - [Guía para contribuir](CONTRIBUTING.md)
 - [Política de seguridad](SECURITY.md)
@@ -83,6 +90,7 @@ calculadora-varillas/
 ├── docs/
 │   ├── ARCHITECTURE.md      Componentes y decisiones
 │   ├── AWS-DEPLOYMENT.md    Despliegue, verificación y operación
+│   ├── DEPLOYMENT-STATUS.md URL y evidencia del despliegue vigente
 │   └── CALCULATIONS.md      Fórmulas, unidades y limitaciones
 ├── infra/
 │   └── cloudformation.yaml  S3 privado + CloudFront OAC

@@ -272,9 +272,17 @@ done
 
 upload() {
   local relative="$1" type="$2" cache="$3"
-  "${AWS[@]}" s3 cp "$ROOT/$relative" "s3://$BUCKET/$relative" \
-    --expected-bucket-owner "$ACCOUNT_ID" --content-type "$type" \
-    --cache-control "$cache" --sse AES256 --only-show-errors --no-progress
+  # Usamos la API de bajo nivel porque --expected-bucket-owner no está
+  # disponible en todas las versiones del comando de alto nivel `aws s3 cp`.
+  "${AWS[@]}" s3api put-object \
+    --bucket "$BUCKET" \
+    --key "$relative" \
+    --body "$ROOT/$relative" \
+    --expected-bucket-owner "$ACCOUNT_ID" \
+    --content-type "$type" \
+    --cache-control "$cache" \
+    --server-side-encryption AES256 \
+    >/dev/null
   printf '  ✓ %s\n' "$relative"
 }
 
