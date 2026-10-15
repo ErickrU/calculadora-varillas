@@ -28,12 +28,14 @@ flowchart LR
 | `index.html` | Estructura semántica, datos solicitados y panel de resultados |
 | `js/calculo.js` | Validación, fórmulas, distribución y alternativas; no usa DOM |
 | `js/app.js` | Adaptador entre formulario, motor de cálculo y presentación |
-| `js/registro-sw.js` | Instalación, estado de conexión y actualización de la PWA |
+| `js/registro-sw.js` | Instalación, compartir, tema, ayuda, Window Controls Overlay, conexión y actualización de la PWA |
 | `sw.js` | Precache del app shell y estrategias de respuesta offline |
-| `manifest.webmanifest` | Nombre, colores, iconos y comportamiento instalable |
-| `css/estilos.css` | Diseño adaptable, estados, foco visible y página offline |
+| `manifest.webmanifest` | Nombre, colores, iconos y comportamiento instalable con WCO y `standalone` |
+| `css/estilos.css` | Temas, diseño adaptable, barra WCO, estados, foco visible y página offline |
 
-La separación del motor (`calculo.js`) permite verificar las fórmulas sin un navegador y evita que la presentación altere el resultado numérico.
+La separación del motor (`calculo.js`) permite verificar las fórmulas sin un navegador y evita que la presentación altere el resultado numérico. La cabecera ofrece exactamente cinco controles accesibles: instalar, compartir, tema, restablecer y ayuda. El restablecimiento invoca el evento nativo del formulario para reutilizar la limpieza implementada por `app.js`.
+
+Cuando la PWA instalada expone `navigator.windowControlsOverlay`, la cabecera usa las cuatro variables `titlebar-area-*`, zonas `drag`/`no-drag` y sincronización de `geometrychange` con 200 ms de espera. Si el rectángulo es angosto, la cabecera pasa a una fila inferior para no solapar los controles del sistema. Una pestaña normal o un navegador sin la API conserva la misma barra como cabecera web.
 
 ## 3. Flujo de cálculo
 

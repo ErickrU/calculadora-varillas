@@ -1,14 +1,24 @@
-/**
- * Registro del service worker, aviso de nueva versión, prompt de instalación
- * y estado de la conexión. Módulo independiente de la lógica de cálculo.
- */
+// Registro del service worker y capacidades de la interfaz PWA.
+const raiz = document.documentElement;
+const metaTema = document.querySelector('meta[name="theme-color"]');
 const estadoSw = document.getElementById('estado-sw');
 const toast = document.getElementById('toast-actualizacion');
 const btnRecargar = document.getElementById('btn-recargar');
-const btnInstalar = document.getElementById('btn-instalar');
+const btnInstalar = document.getElementById('control-instalar');
+const btnCompartir = document.getElementById('control-compartir');
+const btnTema = document.getElementById('control-tema');
+const btnRestablecer = document.getElementById('control-restablecer');
+const btnAyuda = document.getElementById('control-ayuda');
+const dialogoAyuda = document.getElementById('dialogo-ayuda');
+const btnCerrarAyuda = document.getElementById('cerrar-ayuda');
 const chipConexion = document.getElementById('chip-conexion');
 
-const informar = (texto) => { if (estadoSw) estadoSw.textContent = texto ? `Service worker: ${texto}` : ''; };
+let promptInstalacion = null;
+let focoAntesDelDialogo = null;
+let temporizadorGeometria = null;
+
+const anunciar = (texto) => { if (estadoSw) estadoSw.textContent = texto; };
+const informar = (texto) => anunciar(texto ? `Service worker: ${texto}` : '');
 
 /* ================================================================
    1. Service worker
@@ -63,36 +73,164 @@ if (!('serviceWorker' in navigator)) {
 }
 
 /* ================================================================
-   2. Instalación (beforeinstallprompt)
+   2. Instalación
    ================================================================ */
-let promptInstalacion = null;
+function estaInstalada() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function actualizarInstalacion() {
+  if (!btnInstalar || !estaInstalada()) return;
+  btnInstalar.setAttribute('aria-label', 'Aplicación instalada');
+  btnInstalar.title = 'Aplicación instalada';
+  btnInstalar.querySelector('span').textContent = 'Instalada';
+}
 
 window.addEventListener('beforeinstallprompt', (evento) => {
   evento.preventDefault();
   promptInstalacion = evento;
-  if (btnInstalar) btnInstalar.hidden = false;
+  anunciar('La calculadora está lista para instalarse.');
 });
 
 btnInstalar?.addEventListener('click', async () => {
-  if (!promptInstalacion) return;
+  if (estaInstalada()) {
+    anunciar('La calculadora ya está instalada en este dispositivo.');
+    return;
+  }
+  if (!promptInstalacion) {
+    anunciar('Usa la opción «Instalar aplicación» del menú de tu navegador.');
+    return;
+  }
+
   btnInstalar.disabled = true;
   try {
     await promptInstalacion.prompt();
-    await promptInstalacion.userChoice;
+    const eleccion = await promptInstalacion.userChoice;
+    anunciar(eleccion.outcome === 'accepted' ? 'Instalación aceptada.' : 'Instalación cancelada.');
   } finally {
     promptInstalacion = null;
-    btnInstalar.hidden = true;
     btnInstalar.disabled = false;
   }
 });
 
 window.addEventListener('appinstalled', () => {
   promptInstalacion = null;
-  if (btnInstalar) btnInstalar.hidden = true;
+  actualizarInstalacion();
+  anunciar('La calculadora se instaló correctamente.');
 });
 
 /* ================================================================
-   3. Estado de la conexión
+   3. Compartir, tema, restablecer y ayuda
+   ================================================================ */
+async function copiarEnlace() {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(window.location.href);
+    return;
+  }
+
+  const campo = document.createElement('textarea');
+  campo.value = window.location.href;
+  campo.setAttribute('readonly', '');
+  campo.style.position = 'fixed';
+  campo.style.opacity = '0';
+  document.body.append(campo);
+  campo.select();
+  const copiado = document.execCommand('copy');
+  campo.remove();
+  if (!copiado) throw new Error('No se pudo copiar el enlace');
+}
+
+btnCompartir?.addEventListener('click', async () => {
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: document.title,
+        text: 'Calcula el refuerzo longitudinal de columnas de concreto armado.',
+        url: window.location.href,
+      });
+      anunciar('La calculadora se compartió correctamente.');
+    } else {
+      await copiarEnlace();
+      anunciar('Enlace copiado al portapapeles.');
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') return;
+    try {
+      await copiarEnlace();
+      anunciar('Enlace copiado al portapapeles.');
+    } catch {
+      anunciar('No se pudo compartir. Copia la dirección desde el navegador.');
+    }
+  }
+});
+
+function aplicarTema(tema, guardar = true) {
+  raiz.dataset.tema = tema;
+  metaTema.content = tema === 'claro' ? '#f4f6f8' : '#101820';
+  btnTema?.setAttribute('aria-pressed', String(tema === 'claro'));
+  if (btnTema) {
+    btnTema.setAttribute('aria-label', tema === 'claro' ? 'Usar tema oscuro' : 'Usar tema claro');
+    btnTema.title = tema === 'claro' ? 'Usar tema oscuro' : 'Usar tema claro';
+  }
+  if (guardar) localStorage.setItem('calculadora-varillas-tema', tema);
+}
+
+const temaGuardado = localStorage.getItem('calculadora-varillas-tema');
+aplicarTema(temaGuardado === 'claro' ? 'claro' : 'oscuro', false);
+btnTema?.addEventListener('click', () => {
+  const tema = raiz.dataset.tema === 'oscuro' ? 'claro' : 'oscuro';
+  aplicarTema(tema);
+  anunciar(`Tema ${tema} activado.`);
+});
+
+btnRestablecer?.addEventListener('click', () => {
+  document.getElementById('form-columna')?.reset();
+  anunciar('Formulario restablecido a sus valores iniciales.');
+});
+
+function abrirAyuda() {
+  focoAntesDelDialogo = document.activeElement;
+  dialogoAyuda.showModal();
+  btnCerrarAyuda.focus();
+}
+
+btnAyuda?.addEventListener('click', abrirAyuda);
+btnCerrarAyuda?.addEventListener('click', () => dialogoAyuda.close());
+dialogoAyuda?.addEventListener('click', (evento) => {
+  if (evento.target === dialogoAyuda) dialogoAyuda.close();
+});
+dialogoAyuda?.addEventListener('close', () => {
+  if (focoAntesDelDialogo?.isConnected) focoAntesDelDialogo.focus();
+});
+
+/* ================================================================
+   4. Window Controls Overlay
+   ================================================================ */
+function sincronizarWco() {
+  const wco = navigator.windowControlsOverlay;
+  if (!wco) {
+    document.body.classList.remove('wco-visible', 'wco-angosto');
+    document.body.dataset.wco = 'no-disponible';
+    return;
+  }
+
+  const rectangulo = wco.getTitlebarAreaRect();
+  document.body.classList.toggle('wco-visible', wco.visible);
+  document.body.classList.toggle('wco-angosto', wco.visible && rectangulo.width < 720);
+  document.body.dataset.wco = wco.visible ? 'visible' : 'oculto';
+  document.body.dataset.wcoAncho = String(Math.round(rectangulo.width));
+}
+
+sincronizarWco();
+if (navigator.windowControlsOverlay) {
+  navigator.windowControlsOverlay.addEventListener('geometrychange', () => {
+    clearTimeout(temporizadorGeometria);
+    temporizadorGeometria = setTimeout(sincronizarWco, 200);
+  });
+}
+
+/* ================================================================
+   5. Estado de la conexión
    ================================================================ */
 function actualizarConexion() {
   if (!chipConexion) return;
@@ -103,3 +241,4 @@ function actualizarConexion() {
 window.addEventListener('online', actualizarConexion);
 window.addEventListener('offline', actualizarConexion);
 actualizarConexion();
+actualizarInstalacion();

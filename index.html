@@ -26,28 +26,57 @@
   <a class="salto-contenido" href="#contenido">Saltar al contenido</a>
 
   <!-- ============================ CABECERA ============================ -->
-  <header class="cabecera">
+  <header class="cabecera" data-barra-titulo>
     <div class="cabecera__marca">
       <img class="cabecera__logo" src="./iconos/favicon.svg" alt="" width="44" height="44">
-      <div>
+      <div class="cabecera__texto">
         <h1 class="cabecera__titulo">Calculadora de Varillas</h1>
         <p class="cabecera__sub">Refuerzo longitudinal de columnas · NTP E.060</p>
       </div>
     </div>
-    <div class="cabecera__acciones">
-      <button id="btn-instalar" class="boton boton--fantasma" type="button" hidden>
-        <span aria-hidden="true">⬇</span> Instalar app
+    <div class="cabecera__arrastre" aria-hidden="true"></div>
+    <nav class="cabecera__acciones" aria-label="Controles de la aplicación">
+      <button id="control-instalar" class="control-ventana" type="button" data-control-ventana aria-label="Instalar aplicación" title="Instalar aplicación">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg><span>Instalar</span>
       </button>
-    </div>
+      <button id="control-compartir" class="control-ventana" type="button" data-control-ventana aria-label="Compartir calculadora" title="Compartir calculadora">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5m-7.6 6.9 7.6 4.5"/></svg><span>Compartir</span>
+      </button>
+      <button id="control-tema" class="control-ventana" type="button" data-control-ventana aria-label="Cambiar tema" title="Cambiar tema" aria-pressed="false">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 15.2A8 8 0 0 1 8.8 4 8 8 0 1 0 20 15.2Z"/></svg><span>Tema</span>
+      </button>
+      <button id="control-restablecer" class="control-ventana" type="button" data-control-ventana aria-label="Restablecer formulario" title="Restablecer formulario">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4v6h6M5.5 15a7 7 0 1 0 .4-7.5L4 10"/></svg><span>Restablecer</span>
+      </button>
+      <button id="control-ayuda" class="control-ventana" type="button" data-control-ventana aria-label="Abrir ayuda" title="Abrir ayuda">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.7 1.8c-1 .7-1.5 1.2-1.5 2.2m0 3.5h.01"/></svg><span>Ayuda</span>
+      </button>
+    </nav>
   </header>
 
   <!-- ============================ BARRA DE ESTADO ============================ -->
-  <div class="estado" role="status" aria-live="polite">
+  <div class="estado" role="status" aria-live="polite" aria-atomic="true">
     <span id="chip-conexion" class="chip chip--conexion" data-estado="en-linea">
       <span class="punto" aria-hidden="true"></span><span class="chip__texto">En línea</span>
     </span>
     <span id="estado-sw" class="estado__texto"></span>
   </div>
+
+  <dialog id="dialogo-ayuda" aria-labelledby="titulo-ayuda">
+    <div class="dialogo__contenido">
+      <button id="cerrar-ayuda" class="dialogo__cerrar" type="button" aria-label="Cerrar ayuda" title="Cerrar ayuda">×</button>
+      <h2 id="titulo-ayuda">Cómo usar la calculadora</h2>
+      <p>Completa los datos de la columna, selecciona el método y pulsa <strong>Calcular varillas</strong>. Los cálculos se realizan únicamente en tu dispositivo.</p>
+      <ul>
+        <li><strong>Instalar:</strong> añade la aplicación cuando el navegador lo permita.</li>
+        <li><strong>Compartir:</strong> envía o copia el enlace actual.</li>
+        <li><strong>Tema:</strong> alterna entre apariencia oscura y clara.</li>
+        <li><strong>Restablecer:</strong> recupera todos los valores iniciales.</li>
+        <li><strong>Ayuda:</strong> abre esta guía; también puedes cerrarla con Escape.</li>
+      </ul>
+      <p class="dialogo__nota">Herramienta académica: el diseño final debe revisarse con un ingeniero estructural.</p>
+    </div>
+  </dialog>
 
   <main id="contenido" class="contenido">
 

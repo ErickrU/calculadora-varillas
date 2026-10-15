@@ -18,7 +18,9 @@ El sitio se sirve por CloudFront desde un bucket S3 privado. Consulta la [eviden
 - mínimo normativo de barras, armado simétrico y separación libre;
 - diagrama SVG de la sección a escala y tabla de alternativas;
 - validación accesible asociada a cada campo;
-- diseño adaptable para celular y escritorio;
+- diseño adaptable para celular y escritorio, con tema oscuro o claro persistente;
+- barra accesible con cinco controles: instalar, compartir, cambiar tema, restablecer y abrir ayuda;
+- integración con Window Controls Overlay al instalarla y cabecera completa de respaldo en pestañas y navegadores sin esa API;
 - instalable y completamente funcional sin conexión después de la primera visita;
 - cálculo local: no envía ni almacena los datos del formulario;
 - despliegue reproducible en AWS con S3 privado, CloudFront y OAC.
