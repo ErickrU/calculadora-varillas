@@ -558,3 +558,287 @@ dialog {
   font-weight: 700;
   text-decoration: none;
 }
+
+/* ==========================================================================
+   PANEL DE WIDGETS (simulación del Widgets Board de Windows 11)
+   --------------------------------------------------------------------------
+   Hoja lateral translúcida (acrílico) con tarjetas de 8 px de radio y sombras
+   sutiles, pintada con la paleta de la app (tema claro/oscuro automático).
+   Clases pw-* = panel; ac-* = elementos de la Adaptive Card renderizada.
+   ========================================================================== */
+.pw-panel {
+  position: fixed;
+  inset: 0 auto 0 0;
+  margin: 0;
+  width: min(760px, 100vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid var(--borde-neutro);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--fondo-800) 86%, transparent);
+  color: var(--texto);
+  box-shadow: 0 0 48px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  backdrop-filter: blur(28px) saturate(1.4);
+}
+.pw-panel[open] {
+  display: flex;
+  flex-direction: column;
+  animation: pw-entrar 180ms ease-out;
+}
+.pw-panel::backdrop { background: rgba(5, 9, 13, 0.55); backdrop-filter: blur(4px); }
+/* El panel se superpone a la barra de título arrastrable en modo WCO. */
+.pw-panel, .pw-panel * { -webkit-app-region: no-drag; app-region: no-drag; }
+@keyframes pw-entrar {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Cabecera "Widgets" con el icono de la app y el botón de cerrar. */
+.pw-cabecera {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 56px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--borde-neutro);
+  flex: none;
+}
+.pw-icono { width: 28px; height: 28px; border-radius: 7px; flex: none; }
+.pw-titulo { flex: 1 1 auto; margin: 0; font-size: 1.15rem; letter-spacing: -0.01em; }
+/* Botón CUADRADO de 44×44 (toda su área responde); el círculo visible vive en
+   ::before para que las esquinas también sean pulsables. */
+.pw-cerrar {
+  position: relative;
+  isolation: isolate;
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--texto);
+  font: inherit; font-size: 1.5rem; line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.pw-cerrar::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1px solid var(--borde-neutro);
+  transition: border-color 0.15s, background-color 0.15s;
+  z-index: -1;
+}
+.pw-cerrar:hover, .pw-cerrar:focus-visible { color: var(--ambar); }
+.pw-cerrar:hover::before, .pw-cerrar:focus-visible::before { border-color: var(--borde-fuerte); }
+
+.pw-vista { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.pw-tablero { padding: 16px; }
+.pw-herramientas { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+
+/* Botones del panel: mismo lenguaje que .boton--fantasma, 44 px de alto. */
+.pw-agregar-boton, .pw-volver, .pw-opcion__agregar {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px;
+  padding: 8px 16px;
+  font: inherit; font-weight: 700; font-size: 0.92rem;
+  color: var(--texto);
+  background: color-mix(in srgb, var(--panel-2) 80%, transparent);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.pw-agregar-boton:hover, .pw-volver:hover, .pw-opcion__agregar:hover:not(:disabled) {
+  color: var(--ambar);
+  background: rgba(242, 169, 59, 0.10);
+}
+.pw-opcion__agregar:disabled { cursor: default; opacity: 0.6; }
+.pw-volver { justify-self: start; }
+
+/* Rejilla de tarjetas: 320 px cada una, centradas (dos por fila a 760 px). */
+.pw-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 320px);
+  justify-content: center;
+  gap: 16px;
+}
+.pw-tarjeta {
+  width: 320px;
+  max-width: 100%;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border: 1px solid var(--borde-neutro);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+}
+.pw-tarjeta:focus-visible { outline-offset: 2px; }
+.pw-tarjeta__cabecera {
+  display: flex; align-items: center; gap: 8px;
+  height: 40px;
+  padding: 0 4px 0 12px;
+  border-bottom: 1px solid var(--borde-neutro);
+}
+.pw-tarjeta__icono { width: 20px; height: 20px; border-radius: 5px; flex: none; }
+.pw-tarjeta__nombre {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 0.8rem; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pw-quitar {
+  width: 32px; height: 32px;
+  flex: none;
+  padding: 0;
+  border: 0; border-radius: 6px;
+  background: transparent;
+  color: var(--texto-suave);
+  font: inherit; font-size: 1.2rem; line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.pw-quitar:hover { color: var(--ambar); background: var(--panel-2); }
+.pw-tarjeta__cuerpo { padding: 10px 12px; }
+.pw-estado { margin: 0; color: var(--texto-suave); font-size: 0.9rem; }
+.pw-estado--error { color: var(--rojo); }
+.pw-vacio {
+  margin: 0;
+  padding: 28px 12px;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+/* Selector "+ Agregar widget": lista los widgets declarados en el manifest. */
+.pw-agregar { padding: 16px; display: grid; gap: 14px; }
+.pw-agregar__titulo { margin: 0; font-size: 1rem; color: var(--ambar); }
+.pw-opciones { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.pw-opcion {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border: 1px solid var(--borde-neutro);
+  border-radius: 8px;
+}
+.pw-opcion__captura { width: 120px; height: auto; border-radius: 6px; border: 1px solid var(--borde-neutro); }
+.pw-opcion__texto { min-width: 0; }
+.pw-opcion__nombre { display: block; }
+.pw-opcion__descripcion { margin: 4px 0 0; font-size: 0.85rem; color: var(--texto-suave); }
+
+.pw-aviso {
+  flex: none;
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  border-top: 1px solid var(--borde-neutro);
+}
+.pw-aviso a { color: var(--ambar); font-weight: 600; }
+
+/* ----- Adaptive Card renderizada ----- */
+/* Separación por defecto entre elementos consecutivos (6 px); `spacing` la
+   sustituye y `spacing: None` la elimina, como en Adaptive Cards. */
+.ac-cuerpo, .ac-contenedor, .ac-columna { display: grid; align-content: start; }
+.ac-cuerpo > * + *, .ac-contenedor > * + *, .ac-columna > * + * { margin-top: 6px; }
+.ac-texto { margin: 0; overflow-wrap: anywhere; font-size: 0.9rem; line-height: 1.3; }
+.ac-texto[data-size="small"] { font-size: 0.78rem; }
+.ac-texto[data-size="medium"] { font-size: 1.05rem; }
+.ac-texto[data-size="large"] { font-size: 1.35rem; }
+.ac-texto[data-size="extralarge"] { font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.ac-texto[data-weight="lighter"] { font-weight: 300; }
+.ac-texto[data-weight="bolder"] { font-weight: 700; }
+.ac-texto[data-color="accent"], .ac-texto[data-color="warning"] { color: var(--ambar); }
+.ac-texto[data-color="good"] { color: var(--verde); }
+.ac-texto[data-color="attention"] { color: var(--rojo); }
+.ac-texto[data-subtle="true"] { color: var(--texto-suave); }
+.ac-texto[data-wrap="false"] { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-texto[data-align="center"] { text-align: center; }
+.ac-texto[data-align="right"] { text-align: right; }
+
+.ac-tarjeta [data-spacing="none"] { margin-top: 0; }
+.ac-tarjeta [data-spacing="small"] { margin-top: 4px; }
+.ac-tarjeta [data-spacing="medium"] { margin-top: 12px; }
+.ac-tarjeta [data-spacing="large"] { margin-top: 18px; }
+.ac-tarjeta [data-spacing="extralarge"] { margin-top: 24px; }
+.ac-tarjeta [data-spacing="padding"] { margin-top: 12px; }
+.ac-tarjeta [data-separator="true"] { border-top: 1px solid var(--borde-neutro); padding-top: 6px; }
+
+.ac-contenedor[data-style="emphasis"] { padding: 10px; border-radius: 6px; background: var(--panel-2); }
+.ac-contenedor[data-style="accent"], .ac-contenedor[data-style="warning"] {
+  padding: 10px; border-radius: 6px; background: rgba(242, 169, 59, 0.10);
+}
+.ac-contenedor[data-style="good"] { padding: 10px; border-radius: 6px; background: rgba(62, 207, 142, 0.10); }
+.ac-contenedor[data-style="attention"] { padding: 10px; border-radius: 6px; background: rgba(255, 123, 123, 0.10); }
+
+.ac-columnas { display: flex; gap: 10px; align-items: flex-start; }
+.ac-columna { min-width: 0; }
+.ac-columna[data-ancho="auto"] { flex: 0 0 auto; }
+.ac-columna[data-ancho="stretch"] { flex: 1 1 0; }
+.ac-columna[data-ancho="peso"] { flex-basis: 0; }
+.ac-columna[data-ancho="px"] { flex: 0 0 auto; }
+.ac-columna[data-valign="center"] { align-self: center; }
+.ac-columna[data-valign="bottom"] { align-self: flex-end; }
+
+.ac-imagen { display: block; max-width: 100%; height: auto; border-radius: 6px; }
+.ac-imagen[data-size="small"] { width: 40px; }
+.ac-imagen[data-size="medium"] { width: 80px; }
+.ac-imagen[data-size="large"] { width: 160px; }
+.ac-imagen[data-size="stretch"] { width: 100%; }
+.ac-imagen[data-style="person"] { border-radius: 50%; }
+.ac-imagen[data-align="center"] { margin-inline: auto; }
+.ac-imagen[data-align="right"] { margin-inline-start: auto; }
+
+.ac-hechos {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 12px;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+.ac-hecho { display: contents; }
+.ac-hechos dt { color: var(--texto-suave); }
+.ac-hechos dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+.ac-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.ac-accion {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  font: inherit; font-size: 0.88rem; font-weight: 700;
+  color: var(--texto);
+  background: var(--panel-2);
+  border: 1px solid var(--borde-neutro);
+  border-radius: var(--radio-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.ac-accion:hover:not(:disabled) { color: var(--ambar); border-color: var(--borde-fuerte); background: rgba(242, 169, 59, 0.10); }
+.ac-accion:disabled { cursor: default; opacity: 0.55; }
+.ac-accion[data-style="positive"] { background: var(--ambar); color: var(--fondo-900); border-color: transparent; }
+.ac-accion[data-style="destructive"] { border-color: rgba(255, 123, 123, 0.45); color: var(--rojo); }
+.ac-desconocido {
+  padding: 8px 10px;
+  border: 1px dashed var(--borde-neutro);
+  border-radius: 6px;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 720px) {
+  .pw-panel { width: 100vw; border-right: 0; }
+  .pw-rejilla { grid-template-columns: minmax(0, 1fr); }
+  .pw-tarjeta { width: auto; }
+  .pw-opcion { grid-template-columns: minmax(0, 1fr); }
+  .pw-opcion__captura { width: 100%; max-width: 240px; }
+  .pw-opcion__agregar { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pw-panel[open] { animation: none; }
+}

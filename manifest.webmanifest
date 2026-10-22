@@ -38,5 +38,35 @@
       "type": "image/svg+xml",
       "purpose": "any"
     }
+  ],
+  "widgets": [
+    {
+      "name": "Último cálculo",
+      "short_name": "Último cálculo",
+      "description": "Resultado de la última columna calculada: número y diámetro de varillas, distribución y estribo.",
+      "tag": "ultimo-calculo",
+      "template": "ultimo-calculo",
+      "ms_ac_template": "./widgets/ultimo-calculo-plantilla.json",
+      "data": "./widgets/ultimo-calculo-datos.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "./widgets/ultimo-calculo-captura.png",
+          "sizes": "640x600",
+          "type": "image/png",
+          "platform": "windows",
+          "label": "Widget Último cálculo en el panel de widgets"
+        }
+      ],
+      "icons": [
+        {
+          "src": "./iconos/icono-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ],
+      "auth": false,
+      "update": 3600
+    }
   ]
 }

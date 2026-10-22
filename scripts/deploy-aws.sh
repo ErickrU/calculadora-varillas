@@ -94,6 +94,10 @@ PUBLIC_FILES=(
   js/app.js
   js/calculo.js
   js/registro-sw.js
+  js/widgets.js
+  widgets/ultimo-calculo-plantilla.json
+  widgets/ultimo-calculo-datos.json
+  widgets/ultimo-calculo-captura.png
   iconos/favicon.svg
   iconos/icono-192.png
   iconos/icono-512.png
@@ -294,6 +298,10 @@ upload css/estilos.css 'text/css; charset=utf-8' "$SHORT_CACHE"
 upload js/calculo.js 'text/javascript; charset=utf-8' "$SHORT_CACHE"
 upload js/app.js 'text/javascript; charset=utf-8' "$SHORT_CACHE"
 upload js/registro-sw.js 'text/javascript; charset=utf-8' "$SHORT_CACHE"
+upload js/widgets.js 'text/javascript; charset=utf-8' "$SHORT_CACHE"
+upload widgets/ultimo-calculo-plantilla.json 'application/json; charset=utf-8' "$SHORT_CACHE"
+upload widgets/ultimo-calculo-datos.json 'application/json; charset=utf-8' "$SHORT_CACHE"
+upload widgets/ultimo-calculo-captura.png 'image/png' "$ICON_CACHE"
 upload iconos/favicon.svg 'image/svg+xml' "$ICON_CACHE"
 upload iconos/icono-192.png 'image/png' "$ICON_CACHE"
 upload iconos/icono-512.png 'image/png' "$ICON_CACHE"

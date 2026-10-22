@@ -6,6 +6,7 @@
  * numérico, observaciones normativas y alternativas con otros diámetros.
  */
 import { VARILLAS, calcularColumna, formatear, porcentaje } from './calculo.js';
+import { enviarDatosWidget } from './widgets.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,6 +18,10 @@ const resultado = $('resultado');
 
 const CAMPOS = ['b', 'h', 'D', 'fc', 'fy', 'cuantia', 'pu', 'varilla', 'recubrimiento'];
 const VARILLA_POR_DEFECTO = '5/8';
+
+/** Último cálculo que alimenta el widget «Último cálculo» (Edge Widgets y simulador). */
+const CLAVE_ULTIMO_CALCULO = 'calculadora-varillas:ultimo-calculo';
+const TAG_WIDGET = 'ultimo-calculo';
 
 /* ================================================================
    1. Preparación del formulario
@@ -309,6 +314,8 @@ function pintarResultado(r) {
 
   vacio.hidden = true;
   resultado.hidden = false;
+
+  publicarUltimoCalculo(r);
 }
 
 function mostrarVacio() {
@@ -317,7 +324,47 @@ function mostrarVacio() {
 }
 
 /* ================================================================
-   5. Eventos
+   5. Widget «Último cálculo»
+   ================================================================ */
+
+/** Datos planos que enlaza la plantilla widgets/ultimo-calculo-plantilla.json. */
+function construirDatosWidget(r) {
+  const ahora = new Date();
+  const medidas = r.seccion.circular
+    ? `D = ${formatear(r.seccion.D, 0)} cm`
+    : `${formatear(r.seccion.b, 0)} × ${formatear(r.seccion.h, 0)} cm`;
+  return {
+    hayCalculo: true,
+    n: r.barras.n,
+    varilla: r.varilla.nombre,
+    seccion: `${medidas} · ${r.tipo.nombre.toLowerCase()}`,
+    distribucion: textoDistribucion(r),
+    estribo: r.estribo.nombre,
+    recubrimiento: formatear(r.recubrimiento, 1),
+    cuantia: porcentaje(r.acero.cuantiaColocada),
+    actualizado: ahora.toISOString(),
+    actualizadoTexto: `Calculado el ${ahora.toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })}`,
+    urlApp: './',
+  };
+}
+
+/** Persiste el último cálculo y se lo entrega al service worker para el widget. */
+function publicarUltimoCalculo(r) {
+  const datos = construirDatosWidget(r);
+  try { localStorage.setItem(CLAVE_ULTIMO_CALCULO, JSON.stringify(datos)); } catch { /* modo privado */ }
+  enviarDatosWidget(TAG_WIDGET, datos);
+}
+
+/** En cada carga siembra el SW con el último cálculo guardado (no restaura el formulario). */
+function sembrarWidget() {
+  try {
+    const datos = JSON.parse(localStorage.getItem(CLAVE_ULTIMO_CALCULO) ?? 'null');
+    if (datos?.hayCalculo) enviarDatosWidget(TAG_WIDGET, datos);
+  } catch { /* sin cálculos previos o JSON corrupto */ }
+}
+
+/* ================================================================
+   6. Eventos
    ================================================================ */
 
 form.addEventListener('change', (evento) => {
@@ -351,3 +398,4 @@ form.addEventListener('reset', () => {
 
 llenarVarillas();
 sincronizarGrupos();
+sembrarWidget();

@@ -26,3 +26,5 @@ infra/packaged.yaml
 tmp-*
 *.tmp
 *~
+# Metadatos de agentes locales
+.agents/

@@ -1,4 +1,6 @@
 // Registro del service worker y capacidades de la interfaz PWA.
+import { crearPanelWidgets } from './widgets.js';
+
 const raiz = document.documentElement;
 const metaTema = document.querySelector('meta[name="theme-color"]');
 const estadoSw = document.getElementById('estado-sw');
@@ -242,3 +244,16 @@ window.addEventListener('online', actualizarConexion);
 window.addEventListener('offline', actualizarConexion);
 actualizarConexion();
 actualizarInstalacion();
+
+/* ================================================================
+   6. Panel de widgets
+   ----------------------------------------------------------------
+   Simulación del Widgets Board de Windows 11: el sexto control abre un
+   <dialog> que pinta el widget «Último cálculo» con la misma plantilla
+   (ms_ac_template) y los mismos datos que usaría Microsoft Edge.
+   ================================================================ */
+crearPanelWidgets({
+  boton: document.getElementById('control-widgets'),
+  anunciar,
+  claveAlmacen: 'calculadora-varillas:widgets-instalados',
+});
